@@ -1,43 +1,42 @@
-@@ -0,0 +1,89 @@
 # Default
 
-> Base
+> Basic (required)
 ```
-public class DefaultDynamicEnum extends DynamicEnum<DefaultDynamicEnum> {
+public class BasicDynamicEnum extends DynamicEnum<BasicDynamicEnum> {
 
-	private DefaultDynamicEnum(String name, int ordinal) {
+	private BasicDynamicEnum(String name, int ordinal) {
 		super(name, ordinal);
 	}
 
-	public static DefaultDynamicEnum valueOf(String name) {
-		return valueOf(DefaultDynamicEnum.class, name);
+	public static BasicDynamicEnum valueOf(String name) {
+		return valueOf(BasicDynamicEnum.class, name);
 	}
 
-	public static DefaultDynamicEnum[] values() {
-		return values(DefaultDynamicEnum.class);
+	public static BasicDynamicEnum[] values() {
+		return values(BasicDynamicEnum.class);
 	}
 }
 ```
 
 > If static variable is set at load
 ```
-private static DefaultDynamicEnum[] values = null;// loaded values
+private static BasicDynamicEnum[] values = null;// loaded values
 
-public static DefaultDynamicEnum valueOf(String name) {
-  for(DefaultDynamicEnum value : values) {
+public static BasicDynamicEnum valueOf(String name) {
+  for(BasicDynamicEnum value : values) {
     if(value.name().equals(name)) return value;
   }
-  throw new IllegalArgumentException("No enum constant " + DefaultDynamicEnum.class.getCanonicalName() + "." + name);
+  throw new IllegalArgumentException("No enum constant " + BasicDynamicEnum.class.getCanonicalName() + "." + name);
 }
 
-public static DefaultDynamicEnum[] values() {
+public static BasicDynamicEnum[] values() {
   return values;
 }
 ```
 
-# Private
+## Private
 
-> Base
+> example
 ```
 public class PrivateDynamicEnum extends DynamicEnum<PrivateDynamicEnum> {
 	private static final DynamicEnumLoader<PrivateDynamicEnum> loader = new DynamicEnumLoader<PrivateDynamicEnum>() {
@@ -74,7 +73,7 @@ public PrivateDynamicEnum newInstance(String name, int ordinal) throws Exception
 }
 ```
 
-# Extending Enums
+## Extending Enums
 ```
 public class ExtendingDynamicEnum extends DynamicEnum<ExtendingDynamicEnum> {
 
