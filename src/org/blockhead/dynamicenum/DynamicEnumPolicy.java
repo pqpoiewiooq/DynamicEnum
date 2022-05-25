@@ -11,11 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public enum DynamicEnumPolicy {
+public enum DynamicEnumPolicy implements DynamicEnumPolice {
 	/**
      * @throws IllegalArgumentException if duplicate in key or value. or missing ordinal
 	 */
-	STRICT(new DynamicEnumPolice() {
+	STRICT() {
 		@Override
 		public <E extends DynamicEnum<E>> void evaluate(Map<String, E> map, E[] elements) {
 			List<E> list = Arrays.stream(elements)
@@ -43,13 +43,13 @@ public enum DynamicEnumPolicy {
 				throw new IllegalArgumentException("duplicate " + name + " - " + key);
 			};
 		}
-	}),
+	},
 	
 	/**
 	 * - In case of duplicate key, only the first one is allowed.<br>
 	 * - Automatically sets the smallest integer in case of duplicate ordinal.<br>
 	 */
-	SMART(new DynamicEnumPolice() {
+	SMART() {
 		@Override
 		public <E extends DynamicEnum<E>> void evaluate(Map<String, E> map, E[] elements) {
 			List<Integer> ordinals = new LinkedList<>();
@@ -67,7 +67,7 @@ public enum DynamicEnumPolicy {
 			}
 		}
 		
-		public int findMissingPositive(List<Integer> nums) {
+		private int findMissingPositive(List<Integer> nums) {
 			Collections.sort(nums);
 			
 			int i = 0;
@@ -75,7 +75,7 @@ public enum DynamicEnumPolicy {
 	        return i;
 	    }
 		
-		public void forceChangeOrdinal(DynamicEnum<?> element, int ordinal) {
+		private void forceChangeOrdinal(DynamicEnum<?> element, int ordinal) {
 			try {
 				Field field = element.getDeclaringClass().getDeclaredField("ordinal");
 				field.setAccessible(true);
@@ -83,32 +83,17 @@ public enum DynamicEnumPolicy {
 				field.setAccessible(false);
 			} catch (Exception e1) {}
 		}
-	}),
+	},
 	
 	/**
 	 * just call {@link Map#put(Object, Object)}
 	 */
-	LENIENT(new DynamicEnumPolice() {
+	LENIENT() {
 		@Override
 		public <E extends DynamicEnum<E>> void evaluate(Map<String, E> map, E[] elements) {
 			for(E e : elements) {
 				map.put(e.name(), e);
 			}
 		}
-	});
-	
-	private final DynamicEnumPolice police;
-	
-	private DynamicEnumPolicy(DynamicEnumPolice police) {
-		this.police = police;
-	}
-	
-	public <E extends DynamicEnum<E>> void evaluate(Map<String, E> map, E[] elements) {
-		police.evaluate(map, elements);
-	}
-	
-	@FunctionalInterface
-	public interface DynamicEnumPolice {
-		<E extends DynamicEnum<E>> void evaluate(Map<String, E> map, E[] elements);
-	}
+	};
 }
