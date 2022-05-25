@@ -1,37 +1,89 @@
-## Welcome to GitHub Pages
+# Default
 
-You can use the [editor on GitHub](https://github.com/pqpoiewiooq/DynamicEnum/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+> Basic (required)
+```
+public class BasicDynamicEnum extends DynamicEnum<BasicDynamicEnum> {
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+	private BasicDynamicEnum(String name, int ordinal) {
+		super(name, ordinal);
+	}
 
-### Markdown
+	public static BasicDynamicEnum valueOf(String name) {
+		return valueOf(BasicDynamicEnum.class, name);
+	}
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+	public static BasicDynamicEnum[] values() {
+		return values(BasicDynamicEnum.class);
+	}
+}
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+> If static variable is set at load
+```
+private static BasicDynamicEnum[] values = null;// loaded values
 
-### Jekyll Themes
+public static BasicDynamicEnum valueOf(String name) {
+  for(BasicDynamicEnum value : values) {
+    if(value.name().equals(name)) return value;
+  }
+  throw new IllegalArgumentException("No enum constant " + BasicDynamicEnum.class.getCanonicalName() + "." + name);
+}
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/pqpoiewiooq/DynamicEnum/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+public static BasicDynamicEnum[] values() {
+  return values;
+}
+```
 
-### Support or Contact
+## Private
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+> example
+```
+public class PrivateDynamicEnum extends DynamicEnum<PrivateDynamicEnum> {
+	private static final DynamicEnumLoader<PrivateDynamicEnum> loader = new DynamicEnumLoader<PrivateDynamicEnum>() {
+		@Override
+		public PrivateDynamicEnum[] load() {
+			return null; // TODO load Enum
+		}
+	};
+	
+	private PrivateDynamicEnum(String name, int ordinal) {
+		super(name, ordinal);
+	}
+
+	public static PrivateDynamicEnum[] load() {
+		synchronized (PrivateDynamicEnum.class) {
+			return load(PrivateDynamicEnum.class, loader);
+		}
+	}
+	
+	...
+}
+```
+
+> new instance with reflection
+
+```
+public PrivateDynamicEnum newInstance(String name, int ordinal) throws Exception {
+  Constructor<PrivateDynamicEnum> constructor = PrivateDynamicEnum.class.getDeclaredConstructor(String.class, int.class);
+  constructor.setAccessible(true);
+  PrivateDynamicEnum instance = constructor.newInstance(name, ordinal);
+  constructor.setAccessible(false);
+
+  return instance;
+}
+```
+
+## Extending Enums
+```
+public class ExtendingDynamicEnum extends DynamicEnum<ExtendingDynamicEnum> {
+
+	private Object obj;
+	
+	private ExtendingDynamicEnum(String name, int ordinal, Object obj) {
+		super(name, ordinal);
+		
+		this.obj = obj;
+	}
+
+}
+```
